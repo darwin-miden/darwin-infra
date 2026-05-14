@@ -1,4 +1,6 @@
 external/
 .miden-agglayer-data/
+.wdcc-address
+.dcc-mirror-faucet-id
 *.log
 .DS_Store

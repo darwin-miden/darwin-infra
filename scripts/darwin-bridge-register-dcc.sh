@@ -114,9 +114,19 @@ echo "  Response: $RESP"
 
 MIRROR_FAUCET_ID=$(echo "$RESP" | python3 -c "import json,sys; print(json.load(sys.stdin).get('result',''))")
 [[ -z "$MIRROR_FAUCET_ID" ]] && { echo "Could not parse mirror faucet id"; exit 1; }
+
+# Persist artefacts to disk so the bridge-out script can pick them up.
+echo "$WDCC_ADDR" > "$ROOT/.wdcc-address"
+echo "$MIRROR_FAUCET_ID" > "$ROOT/.dcc-mirror-faucet-id"
+
 echo
 echo "✓ DCC registered as a bridgeable faucet."
-echo "  L1 wrapper (wDCC):      $WDCC_ADDR"
-echo "  Miden mirror faucet id: $MIRROR_FAUCET_ID"
+echo "  L1 wrapper (wDCC):      $WDCC_ADDR  (persisted to .wdcc-address)"
+echo "  Miden mirror faucet id: $MIRROR_FAUCET_ID  (persisted to .dcc-mirror-faucet-id)"
 echo
-echo "Persist these in darwin-baskets/state/testnet.toml under [bridge.dcc]."
+echo "Now run:"
+echo "  export DARWIN_DCC_MIRROR_FAUCET_ID=$MIRROR_FAUCET_ID"
+echo "  export WDCC_ADDR=$WDCC_ADDR"
+echo "  ./scripts/darwin-bridge-out-dcc.sh"
+echo
+echo "Also persist these in darwin-baskets/state/testnet.toml under [bridge.dcc]."
