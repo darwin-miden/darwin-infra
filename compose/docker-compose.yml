@@ -1,0 +1,101 @@
+version: "3.9"
+
+# Local Darwin dev stack.
+#
+# Spins up:
+#   - anvil:         L1 EVM chain with pre-deployed AggLayer Unified Bridge
+#                    contracts (matches gateway-fm/miden-agglayer's e2e stack)
+#   - miden-node:    Miden ZK rollup node, devnet config
+#   - miden-faucet:  local testnet faucet (so dev wallets can request tokens)
+#   - postgres:      bridge-service backing store
+#   - agglayer-postgres: miden-agglayer service backing store
+#   - bridge-service: Polygon bridge REST API
+#   - agglayer:      AggLayer certificate aggregation service
+#   - aggkit:        aggoracle + aggsender
+#   - miden-agglayer: gateway-fm bridge proxy (built from the public repo)
+#
+# Once running:
+#   - JSON-RPC for the AggLayer proxy: http://localhost:8546
+#   - Miden node gRPC:                 localhost:57291
+#   - Health checks:                   http://localhost:8546/health
+#
+# This file is a structural draft. Image tags and env vars are pinned
+# once each component publishes a tag we want to use; until then the
+# scripts/up.sh script handles version selection.
+
+services:
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:latest
+    command: anvil --host 0.0.0.0 --chain-id 31337
+    ports:
+      - "8545:8545"
+
+  miden-node:
+    # TODO: pin to a v0.14 image once 0xMiden publishes one to ghcr
+    image: ghcr.io/0xmiden/miden-node:next
+    command: ["start"]
+    ports:
+      - "57291:57291"
+    depends_on:
+      - anvil
+
+  miden-faucet:
+    image: ghcr.io/0xmiden/miden-faucet:latest
+    depends_on:
+      - miden-node
+    environment:
+      MIDEN_NODE_URL: http://miden-node:57291
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: bridge
+      POSTGRES_PASSWORD: bridge
+      POSTGRES_DB: bridge
+    volumes:
+      - bridge-db:/var/lib/postgresql/data
+
+  agglayer-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: agglayer
+      POSTGRES_PASSWORD: agglayer
+      POSTGRES_DB: agglayer
+    volumes:
+      - agglayer-db:/var/lib/postgresql/data
+
+  bridge-service:
+    # TODO: pin image once Polygon publishes a tag we depend on
+    image: zkevm-bridge-service:latest
+    depends_on:
+      - anvil
+      - postgres
+
+  agglayer:
+    image: agglayer:latest
+    depends_on:
+      - postgres
+      - anvil
+
+  aggkit:
+    image: aggkit:latest
+    depends_on:
+      - agglayer
+
+  miden-agglayer:
+    # gateway-fm/miden-agglayer proxy, built from source
+    build:
+      context: ../external/miden-agglayer
+    depends_on:
+      - miden-node
+      - anvil
+      - agglayer-postgres
+    environment:
+      DATABASE_URL: postgres://agglayer:agglayer@agglayer-postgres:5432/agglayer
+      L1_RPC_URL: http://anvil:8545
+    ports:
+      - "8546:8546"
+
+volumes:
+  bridge-db:
+  agglayer-db:
