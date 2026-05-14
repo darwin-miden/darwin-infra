@@ -1,55 +1,48 @@
 # darwin-infra
 
-Local dev stack, reusable CI workflows, and deployment scripts for [Darwin Protocol](https://github.com/darwin-miden).
+Local dev stack and deployment scripts for [Darwin Protocol](https://github.com/darwin-miden).
 
-## Layout
+## Two stacks
 
-```
-darwin-infra/
-├── compose/docker-compose.yml          # Local Darwin + AggLayer stack
-└── scripts/
-    ├── install-toolchain.sh            # Install midenup + Foundry once on a fresh machine
-    ├── check-toolchain.sh              # Smoke-check that the install succeeded
-    ├── up.sh                           # docker compose up (clones gateway-fm/miden-agglayer if needed)
-    └── down.sh                         # docker compose down --volumes
-```
+Darwin has two distinct local stacks:
 
-## Local dev
+1. **Public Miden testnet** (default). The Darwin team's `~/.miden/` points at `rpc.testnet.miden.io`. Faucets / controllers / atomic Flow A notes are exercised here. See `scripts/deploy-testnet.sh` and `scripts/exec-compute-nav-on-chain.sh`.
 
-One-time setup on a fresh machine:
+2. **Local AggLayer + Miden bridge stack** for M1 deliverable 4 (cross-chain bridging). Built on top of [`gateway-fm/miden-agglayer`](https://github.com/gateway-fm/miden-agglayer)'s canonical e2e compose — we do **not** duplicate their docker-compose, we reuse it. The Darwin layer (`scripts/darwin-bridge-*.sh`) adds the `WrappedBasketToken.sol` deployment on Anvil and the `admin_registerFaucet` call that wires Darwin's DCC into the bridge.
+
+## Local bridge stack — one command
+
+Pre-reqs: docker daemon running, foundry installed (`cast`, `forge`), and `darwin-bridge-adapter` checked out alongside `darwin-infra` (for the L1 `WrappedBasketToken.sol`).
 
 ```bash
-./scripts/install-toolchain.sh
+./scripts/darwin-bridge-up.sh            # delegates to upstream `make e2e-up`
+./scripts/darwin-bridge-register-dcc.sh  # deploys wDCC on Anvil + admin_registerFaucet
+./scripts/darwin-bridge-out-dcc.sh       # exercises the L2→L1 bridge-out flow
+./scripts/darwin-bridge-down.sh          # tear down
 ```
 
-Bring the stack up:
+Endpoints once `darwin-bridge-up.sh` returns:
 
-```bash
-./scripts/up.sh                         # blocking, with logs
-./scripts/up.sh --detach                # background
-```
-
-Stack endpoints once running:
-
-- `http://localhost:8546` — `gateway-fm/miden-agglayer` JSON-RPC proxy (mimics an EVM node, translates bridge calls into Miden notes)
+- `http://localhost:8545` — Anvil L1 (with pre-deployed Polygon bridge contracts from upstream's `replay-txs.sh`)
 - `localhost:57291` — Miden node gRPC
-- `http://localhost:8545` — Anvil L1
-- `http://localhost:8546/health` — proxy health
-- `http://localhost:8546/metrics` — Prometheus metrics
+- `http://localhost:8546` — `gateway-fm/miden-agglayer` proxy
+- `http://localhost:18080` — `zkevm-bridge-service` REST API
 
-Tear it down:
+## Public-testnet deployment
 
 ```bash
-./scripts/down.sh
+./scripts/install-toolchain.sh          # one-time: midenup + foundry
+./scripts/deploy-testnet.sh             # reproducible Miden testnet account topology
+./scripts/exec-compute-nav-on-chain.sh  # call compute_nav against the live controller
 ```
 
 ## Status
 
-Scaffold. Image tags in the docker-compose are placeholders pending availability of v0.14 images from 0xMiden. The `install-toolchain.sh` script is end-to-end usable today on macOS + Linux (it installs Foundry and `midenup` and pulls the latest Miden toolchain).
+- `darwin-bridge-up.sh` is a thin wrapper around upstream's `make e2e-up`. The stack itself is whatever's in `external/miden-agglayer/docker-compose.e2e.yml` at the pinned commit.
+- `darwin-bridge-register-dcc.sh` and `darwin-bridge-out-dcc.sh` are pure Darwin glue: deploy our `WrappedBasketToken.sol`, call `admin_registerFaucet`, then drive the bridge using upstream's `bridge-out-tool` and e2e helpers.
+- Upstream notes that the **L2→L1 round-trip is sometimes unstable on cold-start** due to a `miden-node v0.14.10` desync bug; `e2e-l2-to-l1.sh` already extends timeouts to 600s.
 
-No GitHub Actions / CI run on this repo (by design — the Darwin
-team relies on local `cargo test` + `forge test` runs). If you
-fork and want CI, add it under your fork's own `.github/workflows/`.
+No CI workflows on this repo by design — `forge test` and `cargo test` run locally before push.
 
 ## License
 

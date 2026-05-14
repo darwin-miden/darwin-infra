@@ -1,0 +1,4 @@
+external/
+.miden-agglayer-data/
+*.log
+.DS_Store
