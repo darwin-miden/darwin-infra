@@ -19,9 +19,16 @@ version: "3.9"
 #   - Miden node gRPC:                 localhost:57291
 #   - Health checks:                   http://localhost:8546/health
 #
-# This file is a structural draft. Image tags and env vars are pinned
-# once each component publishes a tag we want to use; until then the
-# scripts/up.sh script handles version selection.
+# Image notes:
+#   - hermeznetwork/zkevm-bridge-service and 0xpolygon/agglayer come
+#     from Docker Hub.
+#   - aggkit is built from source under external/aggkit because
+#     0xpolygon doesn't yet publish a public image. scripts/up.sh
+#     clones the repo on first run.
+#   - miden-agglayer is built from gateway-fm/miden-agglayer also
+#     under external/.
+#
+# `docker compose up` requires docker daemon running locally.
 
 services:
   anvil:
@@ -65,20 +72,25 @@ services:
       - agglayer-db:/var/lib/postgresql/data
 
   bridge-service:
-    # TODO: pin image once Polygon publishes a tag we depend on
-    image: zkevm-bridge-service:latest
+    # Polygon zkEVM bridge REST API, pulled from the public registry.
+    image: hermeznetwork/zkevm-bridge-service:v0.6.0
     depends_on:
       - anvil
       - postgres
 
   agglayer:
-    image: agglayer:latest
+    # AggLayer certificate aggregation service.
+    image: 0xpolygon/agglayer:latest
     depends_on:
       - postgres
       - anvil
 
   aggkit:
-    image: aggkit:latest
+    # Polygon aggregation kit. Until 0xpolygon publishes an image to
+    # docker hub, this service is built from source under
+    # external/aggkit; the up.sh script clones the repo on first run.
+    build:
+      context: ../external/aggkit
     depends_on:
       - agglayer
 
