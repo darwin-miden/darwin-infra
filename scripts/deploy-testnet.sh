@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Reproducible recipe for Darwin's M1 testnet deployment.
+# Reproducible recipe for Darwin's testnet deployment.
 #
 # This script does NOT submit any transactions. It prints, in order,
 # every `miden` CLI command the Darwin team ran (or would re-run, on
-# a fresh signing key) to materialize the 10 accounts inventoried in
+# a fresh signing key) to materialize the accounts inventoried in
 # `darwin-baskets/state/testnet.toml`.
 #
-# It exists so the Miden grant reviewers can:
+# It exists so anyone can:
 #   1. See the exact deployment commands as one self-contained recipe.
 #   2. Re-run the recipe on their own key against the same testnet RPC.
 #

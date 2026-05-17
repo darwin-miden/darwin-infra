@@ -8,7 +8,7 @@ Darwin has two distinct local stacks:
 
 1. **Public Miden testnet** (default). The Darwin team's `~/.miden/` points at `rpc.testnet.miden.io`. Faucets / controllers / atomic Flow A notes are exercised here. See `scripts/deploy-testnet.sh` and `scripts/exec-compute-nav-on-chain.sh`.
 
-2. **Local AggLayer + Miden bridge stack** for M1 deliverable 4 (cross-chain bridging). Built on top of [`gateway-fm/miden-agglayer`](https://github.com/gateway-fm/miden-agglayer)'s canonical e2e compose — we do **not** duplicate their docker-compose, we reuse it. The Darwin layer (`scripts/darwin-bridge-*.sh`) adds the `WrappedBasketToken.sol` deployment on Anvil and the `admin_registerFaucet` call that wires Darwin's DCC into the bridge.
+2. **Local AggLayer + Miden bridge stack** for cross-chain bridging. Built on top of [`gateway-fm/miden-agglayer`](https://github.com/gateway-fm/miden-agglayer)'s canonical e2e compose — we do **not** duplicate their docker-compose, we reuse it. The Darwin layer (`scripts/darwin-bridge-*.sh`) adds the `WrappedBasketToken.sol` deployment on Anvil and the `admin_registerFaucet` call that wires Darwin's DCC into the bridge.
 
 ## Local bridge stack — one command
 
