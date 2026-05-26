@@ -36,6 +36,22 @@ Endpoints once `darwin-bridge-up.sh` returns:
 ./scripts/exec-compute-nav-on-chain.sh  # call compute_nav against the live controller
 ```
 
+## Bali 1Click mock (dev)
+
+For day-to-day frontend dev against the Sepolia↔Miden 1Click flow we
+run Brian Seong's mock bridge (`BrianSeong99/miden-testnet-bridge`).
+The durable `.env` template lives here so a /tmp cleanup can't
+silently invalidate the solver wallet (changing `MIDEN_MASTER_SEED_HEX`
+between restarts orphans every prior deposit on the bridge side).
+
+```bash
+BRIDGE_REPO=$HOME/data/darwin/repos/miden-testnet-bridge \
+  ./scripts/bali-mock-bridge-up.sh        # seeds .env from template, runs compose
+```
+
+Template: `scripts/bali-mock-bridge.env.example`. Copy + adjust if a
+real Sepolia signer is needed.
+
 ## Status
 
 - `darwin-bridge-up.sh` is a thin wrapper around upstream's `make e2e-up`. The stack itself is whatever's in `external/miden-agglayer/docker-compose.e2e.yml` at the pinned commit.
