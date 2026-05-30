@@ -30,13 +30,17 @@
         <string>/Users/eden/data/darwin/repos/darwin-infra/scripts/bali-claim-watcher.sh</string>
     </array>
 
-    <!-- The script invokes /Users/eden/.foundry/bin/cast directly so
-         cast doesn't need PATH; python3 + curl + grep do. Keep the
-         minimal common-toolchain PATH so they resolve. -->
+    <!-- bali-claim-watcher.sh uses absolute path /Users/eden/.foundry/
+         bin/cast for its own checks, BUT it shells out to
+         bali-l1-claim.sh which calls `cast` bare (cast wallet address,
+         cast send, cast balance). Without /Users/eden/.foundry/bin
+         on PATH, every claim fire fails with `cast: command not
+         found` and the deposit_cnt cooldown traps the retry for
+         30 min, then fails again. Add foundry. -->
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <string>/Users/eden/.foundry/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     </dict>
 
     <key>RunAtLoad</key>

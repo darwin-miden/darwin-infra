@@ -34,7 +34,15 @@ BRIDGE_SVC="${BRIDGE_SVC:-https://miden-testnet-bridge.dev.eu-north-3.gateway.fm
 NET_ID="${NET_ID:-76}"
 DRY_RUN="${DRY_RUN:-0}"
 
-USER_ADDR=$(cast wallet address --private-key "$USER_PK")
+# Resolve cast binary up-front. Default to bare `cast` (works when
+# foundry is on PATH — interactive shells) but allow override via the
+# CAST env var (needed under launchd, where the agent's PATH usually
+# excludes ~/.foundry/bin and a bare `cast` invocation dies with
+# "cast: command not found" mid-claim — the per-cnt cooldown then
+# traps the retry for 30 min before failing again).
+CAST="${CAST:-cast}"
+
+USER_ADDR=$("$CAST" wallet address --private-key "$USER_PK")
 
 echo "============================================================"
 echo "  Bali L2 → L1 claim"
@@ -119,7 +127,7 @@ SIG='claimAsset(bytes32[32],bytes32[32],uint256,bytes32,bytes32,uint32,address,u
 
 if [[ "$DRY_RUN" == "1" ]]; then
     echo "DRY_RUN=1 — calldata only:"
-    cast calldata "$SIG" \
+    "$CAST" calldata "$SIG" \
         "$SMT_LOCAL" "$SMT_ROLLUP" "$GLOBAL_INDEX" \
         "$MAIN_EXIT" "$ROLLUP_EXIT" \
         "$ORIG_NET" "$ORIG_ADDR" \
@@ -129,12 +137,12 @@ if [[ "$DRY_RUN" == "1" ]]; then
 fi
 
 echo "L1 balance of dest BEFORE claim:"
-DEST_BAL_BEFORE=$(cast balance "$DEST_ADDR" --rpc-url "$RPC")
+DEST_BAL_BEFORE=$("$CAST" balance "$DEST_ADDR" --rpc-url "$RPC")
 echo "  $DEST_ADDR  $DEST_BAL_BEFORE wei"
 echo
 
 echo "submitting claimAsset..."
-OUT=$(cast send "$BRIDGE" "$SIG" \
+OUT=$("$CAST" send "$BRIDGE" "$SIG" \
     "$SMT_LOCAL" "$SMT_ROLLUP" "$GLOBAL_INDEX" \
     "$MAIN_EXIT" "$ROLLUP_EXIT" \
     "$ORIG_NET" "$ORIG_ADDR" \
@@ -152,6 +160,6 @@ echo "  verify : https://sepolia.etherscan.io/tx/$TX"
 echo
 
 echo "L1 balance of dest AFTER claim:"
-DEST_BAL_AFTER=$(cast balance "$DEST_ADDR" --rpc-url "$RPC")
+DEST_BAL_AFTER=$("$CAST" balance "$DEST_ADDR" --rpc-url "$RPC")
 DELTA=$((DEST_BAL_AFTER - DEST_BAL_BEFORE))
 echo "  $DEST_ADDR  $DEST_BAL_AFTER wei  (delta $DELTA wei)"
