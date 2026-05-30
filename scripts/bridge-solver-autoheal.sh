@@ -62,42 +62,51 @@ echo "  pattern      = $PATTERN"
 echo "  cooldown_s   = $COOLDOWN_S"
 echo "  max_per_hour = $MAX_PER_HOUR"
 
-# `--tail 0` skips backlog so we only react to NEW underflows.
-# `-f` follows the live stream. If the bridge container restarts the
-# follow stream stays alive (docker compose reconnects automatically).
-docker compose -f "$COMPOSE_FILE" logs -f --tail 0 --no-log-prefix bridge 2>&1 | while IFS= read -r line; do
-    # Cheap pre-filter before the more expensive case.
-    [[ "$line" == *"$PATTERN"* ]] || continue
+# Outer loop reconnects the log stream after every container restart.
+# Empirically `docker compose logs -f` terminates when its target
+# container is restarted (contrary to the docs), and under `set -euo
+# pipefail` that EOF tears the whole script down. So we wrap the
+# follow + reactor in a loop: when the stream dies we sleep briefly
+# (giving the new container time to bind its log socket) and re-attach
+# to the fresh logs. `--tail 0` keeps every reconnect at the live
+# tail so we don't replay backlog and double-fire.
+while true; do
+    docker compose -f "$COMPOSE_FILE" logs -f --tail 0 --no-log-prefix bridge 2>&1 | while IFS= read -r line; do
+        # Cheap pre-filter before the more expensive case.
+        [[ "$line" == *"$PATTERN"* ]] || continue
 
-    now=$(date +%s)
+        now=$(date +%s)
 
-    # Rolling window reset.
-    if (( now - window_start > 3600 )); then
-        window_start=$now
-        window_restarts=0
-    fi
+        # Rolling window reset.
+        if (( now - window_start > 3600 )); then
+            window_start=$now
+            window_restarts=0
+        fi
 
-    # Cooldown: skip if a restart is too fresh. Underflow logs repeat
-    # every poll cycle (~5s) so we'd otherwise restart in a tight loop
-    # during the bridge's own re-init.
-    if (( now - last_restart_at < COOLDOWN_S )); then
-        remaining=$(( COOLDOWN_S - (now - last_restart_at) ))
-        echo "[$(ts)] underflow seen — cooldown active, ${remaining}s remaining"
-        continue
-    fi
+        # Cooldown: skip if a restart is too fresh. Underflow logs repeat
+        # every poll cycle (~5s) so we'd otherwise restart in a tight loop
+        # during the bridge's own re-init.
+        if (( now - last_restart_at < COOLDOWN_S )); then
+            remaining=$(( COOLDOWN_S - (now - last_restart_at) ))
+            echo "[$(ts)] underflow seen — cooldown active, ${remaining}s remaining"
+            continue
+        fi
 
-    # Rate limit.
-    if (( window_restarts >= MAX_PER_HOUR )); then
-        echo "[$(ts)] underflow seen — rate-limited ($window_restarts restarts this hour)"
-        continue
-    fi
+        # Rate limit.
+        if (( window_restarts >= MAX_PER_HOUR )); then
+            echo "[$(ts)] underflow seen — rate-limited ($window_restarts restarts this hour)"
+            continue
+        fi
 
-    echo "[$(ts)] underflow detected — restarting bridge container"
-    if docker compose -f "$COMPOSE_FILE" restart bridge >/dev/null 2>&1; then
-        last_restart_at=$(date +%s)
-        window_restarts=$((window_restarts + 1))
-        echo "[$(ts)] restart issued (#$window_restarts this hour). Solver re-fund ~45s; next deposit will auto-retry."
-    else
-        echo "[$(ts)] docker compose restart FAILED — check docker daemon"
-    fi
+        echo "[$(ts)] underflow detected — restarting bridge container"
+        if docker compose -f "$COMPOSE_FILE" restart bridge >/dev/null 2>&1; then
+            last_restart_at=$(date +%s)
+            window_restarts=$((window_restarts + 1))
+            echo "[$(ts)] restart issued (#$window_restarts this hour). Solver re-fund ~45s; next deposit will auto-retry."
+        else
+            echo "[$(ts)] docker compose restart FAILED — check docker daemon"
+        fi
+    done
+    echo "[$(ts)] log stream ended (likely container restart) — reconnecting in 5s"
+    sleep 5
 done
