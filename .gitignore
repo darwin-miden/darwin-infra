@@ -4,3 +4,9 @@ external/
 .dcc-mirror-faucet-id
 *.log
 .DS_Store
+
+# Operator env file with real secrets (USER_PK etc). Never commit.
+# Use .env.example as the template + $HOME/.darwin-env for the real
+# values; both paths are sourced by scripts/ at startup.
+.env
+.env.local

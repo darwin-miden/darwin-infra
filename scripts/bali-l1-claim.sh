@@ -27,7 +27,13 @@
 set -euo pipefail
 
 DEPOSIT_CNT="${DEPOSIT_CNT:?DEPOSIT_CNT must be set}"
-USER_PK="${USER_PK:-0x47b0a088fc62101d8aefc501edec2266ff2fc4cf84c93a8e6c315dedb0d942be}"
+# Source $HOME/.darwin-env if present (where the operator key lives
+# — not committed to the repo). Then require USER_PK; never embed a
+# default that bakes the key into git history.
+if [[ -f "$HOME/.darwin-env" ]]; then
+    set -a; source "$HOME/.darwin-env"; set +a
+fi
+: "${USER_PK:?USER_PK must be set (export it or put it in \$HOME/.darwin-env — see darwin-infra/.env.example)}"
 RPC="${RPC:-https://ethereum-sepolia-rpc.publicnode.com}"
 BRIDGE="${BRIDGE:-0x1348947e282138d8f377b467F7D9c2EB0F335d1f}"
 BRIDGE_SVC="${BRIDGE_SVC:-https://miden-testnet-bridge.dev.eu-north-3.gateway.fm/api}"

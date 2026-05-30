@@ -47,7 +47,12 @@ set -euo pipefail
 POLL_INTERVAL_S="${POLL_INTERVAL_S:-300}"
 MAX_PER_HOUR="${MAX_PER_HOUR:-10}"
 COOLDOWN_PER_CNT_S="${COOLDOWN_PER_CNT_S:-1800}"
-USER_PK="${USER_PK:-0x47b0a088fc62101d8aefc501edec2266ff2fc4cf84c93a8e6c315dedb0d942be}"
+# Operator key sourced from $HOME/.darwin-env (gitignored) rather than
+# defaulted inline — defaults bake the key into git history forever.
+if [[ -f "$HOME/.darwin-env" ]]; then
+    set -a; source "$HOME/.darwin-env"; set +a
+fi
+: "${USER_PK:?USER_PK must be set (export it or put it in \$HOME/.darwin-env — see darwin-infra/.env.example)}"
 BRIDGE_SVC="${BRIDGE_SVC:-https://miden-testnet-bridge.dev.eu-north-3.gateway.fm/api}"
 STATE_FILE="${STATE_FILE:-/tmp/bali-claim-watcher.state}"
 

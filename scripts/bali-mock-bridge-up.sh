@@ -29,9 +29,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BRIDGE_REPO="${BRIDGE_REPO:-$HOME/data/darwin/repos/miden-testnet-bridge}"
 
-# Dev key for SOLVER_PRIVATE_KEY + DEMO_EVM_FUNDED_PRIVATE_KEY. Per
-# project memory this address is FOR DEV ONLY — never mainnet funds.
-DEV_KEY="${BALI_DEV_KEY:-0x47b0a088fc62101d8aefc501edec2266ff2fc4cf84c93a8e6c315dedb0d942be}"
+# Operator key for SOLVER_PRIVATE_KEY + DEMO_EVM_FUNDED_PRIVATE_KEY.
+# Sourced from $HOME/.darwin-env (gitignored) rather than defaulted
+# inline so the key never enters git history. Testnet burner only;
+# the legacy BALI_DEV_KEY env var still works for backward compat.
+if [[ -f "$HOME/.darwin-env" ]]; then
+    set -a; source "$HOME/.darwin-env"; set +a
+fi
+DEV_KEY="${BALI_DEV_KEY:-${USER_PK:-}}"
+: "${DEV_KEY:?BALI_DEV_KEY (or USER_PK) must be set — see darwin-infra/.env.example}"
 ANVIL_MNEMONIC="test test test test test test test test test test test junk"
 SEPOLIA_RPC="${BALI_SEPOLIA_RPC:-https://ethereum-sepolia-rpc.publicnode.com}"
 
