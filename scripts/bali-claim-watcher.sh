@@ -111,8 +111,11 @@ while true; do
             echo "[$(ts)] bridge svc query failed for $addr"
             continue
         }
-        # Extract ready & unclaimed deposit_cnts.
-        readarray -t ready_cnts < <(echo "$body" | python3 -c "
+        # Extract ready & unclaimed deposit_cnts. Plain word-splitting
+        # rather than `readarray`/`mapfile` because macOS ships bash 3.2
+        # and the array-builders are bash 4+. The cnts are numeric so
+        # there's no whitespace risk.
+        ready_cnts=$(echo "$body" | python3 -c "
 import json, sys
 try:
     d = json.load(sys.stdin)
@@ -122,7 +125,7 @@ try:
 except Exception as e:
     sys.stderr.write(f'parse fail: {e}\n')
 ")
-        for cnt in "${ready_cnts[@]}"; do
+        for cnt in $ready_cnts; do
             [[ -z "$cnt" ]] && continue
             total_ready=$((total_ready + 1))
             if (( window_claims >= MAX_PER_HOUR )); then
