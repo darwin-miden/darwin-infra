@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for darwin-relay-v2 background worker.
+
+  Drives the on-chain legs the HTTP server cannot: drain inbound
+  P2ID notes into the relay vault, emit atomic_deposit_note for
+  POSITION_CREDITED intents, fire b2agg burns for REQUESTED
+  redemptions, poll the Bali bridge service for matured claims and
+  flip sepolia_release_tx.
+
+  Env vars MUST mirror com.darwin.relay-v2.plist (same accounts,
+  same backing sqlite/keystore). When updating one, update both.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.relay-v2-worker</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/eden/data/darwin/repos/darwin-relay/target/release/darwin_relay_v2_worker</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+        <key>RUST_LOG</key>
+        <string>info</string>
+        <key>DARWIN_RELAY_V2_STORE</key>
+        <string>/tmp/darwin-relay/relay-v2.sqlite</string>
+        <key>DARWIN_RELAY_V2_MIDEN_STORE</key>
+        <string>/Users/eden/.miden/store.sqlite3</string>
+        <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
+        <string>/Users/eden/.miden/keystore</string>
+        <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
+        <string>0xed3cd5befa3207805f8529207cfc0d</string>
+        <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
+        <string>0x2a3ea0a268d97b80497d6a966e3141</string>
+        <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
+        <string>b2agg</string>
+        <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
+        <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
+        <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
+        <string>0xc98bb07c188cd2500e13f68a069cdc</string>
+        <key>DARWIN_RELAY_V2_BALI_BRIDGE_SERVICE</key>
+        <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
+        <key>DARWIN_RELAY_V2_WORKER_INTERVAL_S</key>
+        <string>30</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/darwin-relay/worker.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/darwin-relay/worker.log</string>
+</dict>
+</plist>

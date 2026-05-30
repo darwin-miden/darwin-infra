@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for bali-claim-watcher.sh
+
+  Polls the gateway-fm Bali bridge service every POLL_INTERVAL_S
+  and fires Sepolia claimAsset(...) for every mature unclaimed
+  entry. Without supervision the script dies once and the entire
+  L2→L1 hands-free path silently breaks: deposits accumulate at
+  ready_for_claim=true in the bridge service, sepolia_release_tx
+  never lands in the relay row, users see "claim pending" forever.
+
+  KeepAlive=true respawns on any exit. The script already idempotent
+  via per-deposit_cnt cooldown (1800s) and hourly rate cap (10/h),
+  so respawn after a partial run cannot double-fire a claim.
+
+  Install:
+    cp launchd/com.darwin.bali-claim-watcher.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) \
+       ~/Library/LaunchAgents/com.darwin.bali-claim-watcher.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.bali-claim-watcher</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/eden/data/darwin/repos/darwin-infra/scripts/bali-claim-watcher.sh</string>
+    </array>
+
+    <!-- The script invokes /Users/eden/.foundry/bin/cast directly so
+         cast doesn't need PATH; python3 + curl + grep do. Keep the
+         minimal common-toolchain PATH so they resolve. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/bali-claim-watcher.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/bali-claim-watcher.log</string>
+</dict>
+</plist>

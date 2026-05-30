@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for darwin-relay-v2 HTTP server.
+
+  The relay binds :8090 and is the public-facing surface (via the
+  cloudflare tunnel). If it dies the frontend's POST /v0/intents,
+  GET /v0/intents/:cid, POST /v0/redeem, etc. all 502 — every
+  in-flight user flow breaks visibly.
+
+  Env vars MUST match what the worker reads — same
+  DARWIN_RELAY_V2_RELAY_WALLET_HEX / CONTROLLER_HEX / BALI_* etc.
+  See com.darwin.relay-v2-worker.plist; they need to stay in sync.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.relay-v2</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/eden/data/darwin/repos/darwin-relay/target/release/darwin_relay_v2</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+        <key>RUST_LOG</key>
+        <string>info</string>
+        <key>DARWIN_RELAY_V2_STORE</key>
+        <string>/tmp/darwin-relay/relay-v2.sqlite</string>
+        <key>DARWIN_RELAY_V2_MIDEN_STORE</key>
+        <string>/Users/eden/.miden/store.sqlite3</string>
+        <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
+        <string>/Users/eden/.miden/keystore</string>
+        <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
+        <string>0xed3cd5befa3207805f8529207cfc0d</string>
+        <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
+        <string>0x2a3ea0a268d97b80497d6a966e3141</string>
+        <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
+        <string>b2agg</string>
+        <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
+        <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
+        <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
+        <string>0xc98bb07c188cd2500e13f68a069cdc</string>
+        <key>DARWIN_RELAY_V2_BALI_BRIDGE_SERVICE</key>
+        <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/darwin-relay/server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/darwin-relay/server.log</string>
+</dict>
+</plist>
