@@ -1,7 +1,7 @@
 # launchd LaunchAgents
 
 Six supervisor specs for the long-running daemons in this repo and
-the sibling darwin-relay checkout. All four follow the same pattern:
+the sibling darwin-relay checkout. All six follow the same pattern:
 `KeepAlive=true`, `ThrottleInterval=10`, stdout+stderr appended to
 the daemon's existing log path under `/tmp/` so the manual
 `tail -f /tmp/<daemon>.log` workflow keeps working.
