@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for the Cloudflare Quick Tunnel that exposes
+  the 1Click mock bridge's :8080 HTTP server to a public URL.
+  Mirrors com.darwin.cf-tunnel-relay; same wrapper, different
+  upstream port and publish path.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.cf-tunnel-oneclick</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/eden/data/darwin/repos/darwin-infra/scripts/cf-tunnel.sh</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>CF_TUNNEL_PORT</key>
+        <string>8080</string>
+        <key>CF_TUNNEL_URL_FILE</key>
+        <string>/tmp/cf-oneclick-url</string>
+        <key>CF_TUNNEL_LABEL</key>
+        <string>cf-tunnel-oneclick</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/cf-oneclick.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/cf-oneclick.log</string>
+</dict>
+</plist>

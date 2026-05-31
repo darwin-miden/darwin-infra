@@ -1,6 +1,6 @@
 # launchd LaunchAgents
 
-Four supervisor specs for the long-running daemons in this repo and
+Six supervisor specs for the long-running daemons in this repo and
 the sibling darwin-relay checkout. All four follow the same pattern:
 `KeepAlive=true`, `ThrottleInterval=10`, stdout+stderr appended to
 the daemon's existing log path under `/tmp/` so the manual
@@ -29,7 +29,7 @@ populate, `chmod 600`).
 ## Install
 
 ```bash
-for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker}; do
+for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker,cf-tunnel-relay,cf-tunnel-oneclick}; do
   cp launchd/$L.plist ~/Library/LaunchAgents/
   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/$L.plist
 done
@@ -38,7 +38,7 @@ done
 Verify each came up clean:
 
 ```bash
-for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker}; do
+for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker,cf-tunnel-relay,cf-tunnel-oneclick}; do
   launchctl print gui/$(id -u)/$L | grep -E "^\s+state|^\s+pid"
 done
 ```
@@ -53,7 +53,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.darwin.<label>.plist
 ## Stop everything
 
 ```bash
-for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker}; do
+for L in com.darwin.{bridge-solver-autoheal,bali-claim-watcher,relay-v2,relay-v2-worker,cf-tunnel-relay,cf-tunnel-oneclick}; do
   launchctl bootout gui/$(id -u)/$L
 done
 ```
