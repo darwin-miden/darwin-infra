@@ -8,7 +8,7 @@
   IMPORTANT: this is the account-less / quick tunnel. The URL CHANGES
   on every cloudflared restart (and Cloudflare may reclaim slugs at
   any moment). For a stable reviewer-facing URL switch to a named
-  tunnel + cloudflare account; that's outside the M3 polish scope.
+  tunnel + cloudflare account; that's TODO.
 
   Install:
     cp launchd/com.darwin.cf-tunnel-relay.plist ~/Library/LaunchAgents/

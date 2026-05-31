@@ -28,7 +28,7 @@
 # Net effect: the local FS contract `cat <url-file>` is always either
 # a working URL or empty (during the few seconds between respawn and
 # capture). Reviewer-stable HTTPS requires a NAMED tunnel + Cloudflare
-# account (TODO; outside the M3 polish scope).
+# account (TODO).
 #
 # Env (sensible defaults; overridable by the calling plist):
 #   CF_TUNNEL_PORT       upstream port (default 8090, the relay)
