@@ -51,6 +51,24 @@
              Bali revives. Switch back via `bali` value (see
              redemption_outbound_rot memory). -->
         <string>bridge_out_v1</string>
+        <!-- 2026-06-06 17:15: Bridge mock was reset with a fresh
+             MIDEN_MASTER_SEED_HEX after its solver wallet drifted into
+             a private-account-irrecoverable state (same drift class as
+             relay_wallet 0xed3cd5be… earlier today). New seed →
+             deterministic new IDs. Captured from the post-reset first
+             demo deposit's bridge log line "submitting Miden pay-to-id
+             mint". Override BOTH the inbound-side FAUCET_HEX (worker
+             vault snapshots + bridge_out V1 read) AND the outbound-side
+             OUTBOUND_FAUCET_HEX (asset shipped back to user on redeem)
+             so the worker sees the dETH the new mock actually mints
+             instead of the now-stale 0xf45bad08… The relay wallet
+             still holds 1.4e14 of the old faucet but the new mock
+             doesn't recognise it. Each future bridge reseed re-rolls
+             this — see mock_bridge_faucet_drift memory. -->
+        <key>DARWIN_RELAY_V2_FAUCET_HEX</key>
+        <string>0xd12ea558804523a037ae46a7952016</string>
+        <key>DARWIN_RELAY_V2_OUTBOUND_FAUCET_HEX</key>
+        <string>0xd12ea558804523a037ae46a7952016</string>
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
         <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
