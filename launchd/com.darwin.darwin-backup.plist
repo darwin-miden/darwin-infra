@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Nightly snapshot of operator state at 03:30 local. Backs up the
+  miden-client store, keystore, and cloudflared cert+credentials to
+  ~/Backups/darwin/<kind>/YYYYMMDD/. Keeps 14 days.
+
+  Why nightly: chain history can be re-fetched from testnet (slow but
+  possible); keystore + cloudflared cert cannot — losing either bricks
+  the operator role permanently. Backup running locally only — disk
+  failure on this Mac still loses everything; consider a remote sync
+  (rclone to a personal Dropbox / B2) as a follow-up.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.darwin-backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/eden/data/darwin/repos/darwin-infra/scripts/darwin-backup.sh</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/eden</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/darwin-backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/darwin-backup.log</string>
+</dict>
+</plist>

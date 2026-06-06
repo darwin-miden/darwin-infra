@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for the Cloudflare Named Tunnel that exposes
+  the Mac's :3010 Next.js dev server to https://api.darwin.market
+  via a stable, account-bound tunnel UUID.
+
+  Stable URL (never rotates):       https://api.darwin.market
+  Tunnel UUID:                       5aaf2d6e-0458-428c-a255-99a42aa5d2c7
+  Tunnel target (cfargotunnel.com):  5aaf2d6e-0458-428c-a255-99a42aa5d2c7.cfargotunnel.com
+  CNAME at OVH:                      api.darwin.market → tunnel target
+
+  Replaces the quick-tunnel + url-watcher + auto-redeploy stack
+  (com.darwin.cf-tunnel-frontend, com.darwin.cf-url-vercel-sync).
+  Because the URL is stable across cloudflared restarts the Vercel
+  prod deploy only needs one env update — no per-rotation rebuild.
+
+  Config + credentials live in ~/.cloudflared/:
+    config.yml      — ingress rules
+    <uuid>.json     — tunnel credentials (KEEP SECRET, do not commit)
+    cert.pem        — origin cert from cloudflared tunnel login
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.cf-named-tunnel-frontend</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/cloudflared</string>
+        <string>--config</string>
+        <string>/Users/eden/.cloudflared/config.yml</string>
+        <string>--no-autoupdate</string>
+        <string>tunnel</string>
+        <string>run</string>
+        <string>darwin-frontend</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/eden</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/cf-named-tunnel-frontend.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/cf-named-tunnel-frontend.log</string>
+</dict>
+</plist>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd LaunchAgent for the operator-side Next.js server.
+  Runs `next start -p 3010` (NOT `next dev`) so:
+    * Pages render from the static prerender output (fast)
+    * /api/* routes still execute as Node serverless functions
+    * Crash → launchd KeepAlive auto-respawns
+    * Reboot → starts at boot
+
+  The CF named tunnel routes only /api/* paths to :3010, so the
+  build's static pages are never publicly served from the Mac —
+  Vercel serves the public face. The Mac only serves the
+  miden-client-backed /api/faucet/mint + /api/position routes.
+
+  After pushing code changes that affect API routes, the operator
+  must rebuild manually:
+    cd ~/data/darwin/repos/darwin-frontend
+    npm run build
+    launchctl kickstart -k gui/$(id -u)/com.darwin.darwin-frontend-next
+
+  (Vercel rebuilds the public site automatically from the same git
+  push, so the public flow is unaffected during a Mac rebuild.)
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.darwin.darwin-frontend-next</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/eden/.nvm/versions/node/v22.22.2/bin/npm</string>
+        <string>run</string>
+        <string>start</string>
+        <string>--</string>
+        <string>-p</string>
+        <string>3010</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/eden/data/darwin/repos/darwin-frontend</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/eden/.nvm/versions/node/v22.22.2/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/eden</string>
+        <key>NODE_ENV</key>
+        <string>production</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/darwin-frontend-next.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/darwin-frontend-next.log</string>
+</dict>
+</plist>

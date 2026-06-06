@@ -35,11 +35,22 @@
         <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
         <string>/Users/eden/.miden/keystore</string>
         <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
-        <string>0xed3cd5befa3207805f8529207cfc0d</string>
+        <!-- Old wallet 0xed3cd5be… was a PRIVATE account that drifted
+             on 2026-06-04 (chain advanced to a commitment we never
+             computed locally); miden-client provides no recovery path
+             for private wallets. Replaced with PUBLIC wallet so future
+             drift can be auto-recovered via Client::import_account_by_id. -->
+        <string>0x6651e5ac8195b2000187593fff7e03</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
         <string>0x2a3ea0a268d97b80497d6a966e3141</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
-        <string>b2agg</string>
+        <!-- 2026-06-06: bridge_out_v1 now calls /demo/flows/outbound/
+             submit (the mock's actual outbound path) instead of the
+             inbound /v0/deposit/submit. b2agg is dormant — Bali
+             gateway.fm still 404 — but kept as the fallback for when
+             Bali revives. Switch back via `bali` value (see
+             redemption_outbound_rot memory). -->
+        <string>bridge_out_v1</string>
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
         <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
