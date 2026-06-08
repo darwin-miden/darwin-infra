@@ -42,7 +42,7 @@
              be auto-recovered via Client::import_account_by_id. -->
         <string>0x6651e5ac8195b2000187593fff7e03</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
-        <string>0x2a3ea0a268d97b80497d6a966e3141</string>
+        <string>0xbef7d2e89e9c3e006e10f959fa16d2</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
         <string>b2agg</string>
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
