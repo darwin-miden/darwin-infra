@@ -66,9 +66,9 @@
              doesn't recognise it. Each future bridge reseed re-rolls
              this — see mock_bridge_faucet_drift memory. -->
         <key>DARWIN_RELAY_V2_FAUCET_HEX</key>
-        <string>0x3063d8a9be0394a074c806d86ab776</string>
+        <string>0xd0c995ef2f8e53a0659fb7ec2f570f</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_FAUCET_HEX</key>
-        <string>0x3063d8a9be0394a074c806d86ab776</string>
+        <string>0xd0c995ef2f8e53a0659fb7ec2f570f</string>
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
         <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
