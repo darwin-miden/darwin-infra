@@ -66,9 +66,9 @@
              doesn't recognise it. Each future bridge reseed re-rolls
              this — see mock_bridge_faucet_drift memory. -->
         <key>DARWIN_RELAY_V2_FAUCET_HEX</key>
-        <string>0xd0c995ef2f8e53a0659fb7ec2f570f</string>
+        <string>0x0a7d175ed63ec5200fb2ced86f6aa5</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_FAUCET_HEX</key>
-        <string>0xd0c995ef2f8e53a0659fb7ec2f570f</string>
+        <string>0x0a7d175ed63ec5200fb2ced86f6aa5</string>
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
         <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
@@ -77,6 +77,16 @@
         <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
         <key>DARWIN_RELAY_V2_WORKER_INTERVAL_S</key>
         <string>30</string>
+        <!-- 2026-06-10: Epoch dUSDC path. The Epoch bridge ships
+             USD-pegged tokens to the Miden side, so the worker
+             needs to value incoming amounts at $1 instead of the
+             live ETH price (legacy 1Click dETH path). dUSDC's
+             Miden-side decimals are still 8 to match the basket
+             tokens. Unset both vars to revert to the dETH path. -->
+        <key>DARWIN_RELAY_V2_ASSET_PRICE_USD</key>
+        <string>1.0</string>
+        <key>DARWIN_RELAY_V2_ASSET_DECIMALS</key>
+        <string>8</string>
     </dict>
 
     <key>RunAtLoad</key>
