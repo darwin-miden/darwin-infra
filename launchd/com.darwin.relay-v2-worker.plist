@@ -80,13 +80,17 @@
         <!-- 2026-06-10: Epoch dUSDC path. The Epoch bridge ships
              USD-pegged tokens to the Miden side, so the worker
              needs to value incoming amounts at $1 instead of the
-             live ETH price (legacy 1Click dETH path). dUSDC's
-             Miden-side decimals are still 8 to match the basket
-             tokens. Unset both vars to revert to the dETH path. -->
+             live ETH price (legacy 1Click dETH path). dUSDC on
+             Miden is 6-decimal (verified via vault snapshot
+             2026-06-10 16:52: 1e18 wei → 1e6 dUSDC base). Need
+             wei_per_miden_base = 10^12 (18→6 conversion) and
+             asset_decimals = 6. Unset to revert to dETH path. -->
         <key>DARWIN_RELAY_V2_ASSET_PRICE_USD</key>
         <string>1.0</string>
         <key>DARWIN_RELAY_V2_ASSET_DECIMALS</key>
-        <string>8</string>
+        <string>6</string>
+        <key>DARWIN_RELAY_V2_WEI_PER_MIDEN_BASE</key>
+        <string>1000000000000</string>
     </dict>
 
     <key>RunAtLoad</key>
