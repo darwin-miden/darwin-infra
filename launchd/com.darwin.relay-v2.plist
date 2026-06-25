@@ -28,27 +28,29 @@
         <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
         <key>RUST_LOG</key>
         <string>info</string>
+        <!-- 2026-06-25: testnet migrated to Miden v0.15. New chain,
+             fresh store + keystore. See worker plist for context. -->
+        <key>MIDEN_NETWORK</key>
+        <string>testnet</string>
         <key>DARWIN_RELAY_V2_STORE</key>
         <string>/tmp/darwin-relay/relay-v2.sqlite</string>
         <key>DARWIN_RELAY_V2_MIDEN_STORE</key>
-        <string>/Users/eden/.miden/store.sqlite3</string>
+        <string>/tmp/miden-relay-testnet-home/.miden/store.sqlite3</string>
         <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
-        <string>/Users/eden/.miden/keystore</string>
+        <string>/tmp/miden-relay-testnet-home/.miden/keystore</string>
         <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
-        <!-- Old wallet 0xed3cd5be… was a PRIVATE account that drifted
-             (chain advanced to a commitment we never computed locally);
-             miden-client provides no recovery path for private wallets.
-             Replaced 2026-06-06 with PUBLIC wallet so future drift can
-             be auto-recovered via Client::import_account_by_id. -->
-        <string>0x6651e5ac8195b2000187593fff7e03</string>
+        <!-- 2026-06-25: fresh Public relay wallet on testnet v0.15. -->
+        <string>0x98494868d18218b12f09e9bef727a1</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
-        <string>0xbef7d2e89e9c3e006e10f959fa16d2</string>
+        <!-- 2026-06-23: v7 controller redeployed on testnet v0.15. -->
+        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
-        <string>b2agg</string>
+        <string>bridge_out_v1</string>
+        <!-- Bali dormant; placeholder valid v0.15 hex so boot passes. -->
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
-        <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
-        <string>0xc98bb07c188cd2500e13f68a069cdc</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_SERVICE</key>
         <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
     </dict>

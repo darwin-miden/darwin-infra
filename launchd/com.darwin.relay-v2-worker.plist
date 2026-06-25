@@ -28,51 +28,52 @@
         <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
         <key>RUST_LOG</key>
         <string>info</string>
+        <!-- 2026-06-25: testnet was migrated to Miden v0.15 on
+             2026-06-23. Old store + keystore (v0.14 hexes, v0.14
+             genesis) are now incompatible with the new chain. Point
+             the worker at the fresh v0.15 home created during the
+             redeploy. -->
+        <key>MIDEN_NETWORK</key>
+        <string>testnet</string>
         <key>DARWIN_RELAY_V2_STORE</key>
         <string>/tmp/darwin-relay/relay-v2.sqlite</string>
         <key>DARWIN_RELAY_V2_MIDEN_STORE</key>
-        <string>/Users/eden/.miden/store.sqlite3</string>
+        <string>/tmp/miden-relay-testnet-home/.miden/store.sqlite3</string>
         <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
-        <string>/Users/eden/.miden/keystore</string>
+        <string>/tmp/miden-relay-testnet-home/.miden/keystore</string>
         <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
-        <!-- Old wallet 0xed3cd5be… was a PRIVATE account that drifted
-             on 2026-06-04 (chain advanced to a commitment we never
-             computed locally); miden-client provides no recovery path
-             for private wallets. Replaced with PUBLIC wallet so future
-             drift can be auto-recovered via Client::import_account_by_id. -->
-        <string>0x6651e5ac8195b2000187593fff7e03</string>
+        <!-- 2026-06-25: fresh Public relay wallet on testnet v0.15
+             (the old wallet 0x6651e5ac… was on the dead v0.14 chain). -->
+        <string>0x98494868d18218b12f09e9bef727a1</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
-        <string>0xbef7d2e89e9c3e006e10f959fa16d2</string>
+        <!-- 2026-06-23: v7 controller redeployed on testnet v0.15
+             (was 0xbef7d2e89e9c3e006e10f959fa16d2 on v0.14). -->
+        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
-        <!-- 2026-06-06: bridge_out_v1 now calls /demo/flows/outbound/
-             submit (the mock's actual outbound path) instead of the
-             inbound /v0/deposit/submit. b2agg is dormant — Bali
-             gateway.fm still 404 — but kept as the fallback for when
-             Bali revives. Switch back via `bali` value (see
-             redemption_outbound_rot memory). -->
         <string>bridge_out_v1</string>
-        <!-- 2026-06-06 17:15: Bridge mock was reset with a fresh
-             MIDEN_MASTER_SEED_HEX after its solver wallet drifted into
-             a private-account-irrecoverable state (same drift class as
-             relay_wallet 0xed3cd5be… earlier today). New seed →
-             deterministic new IDs. Captured from the post-reset first
-             demo deposit's bridge log line "submitting Miden pay-to-id
-             mint". Override BOTH the inbound-side FAUCET_HEX (worker
-             vault snapshots + bridge_out V1 read) AND the outbound-side
-             OUTBOUND_FAUCET_HEX (asset shipped back to user on redeem)
-             so the worker sees the dETH the new mock actually mints
-             instead of the now-stale 0xf45bad08… The relay wallet
-             still holds 1.4e14 of the old faucet but the new mock
-             doesn't recognise it. Each future bridge reseed re-rolls
-             this — see mock_bridge_faucet_drift memory. -->
+        <!-- 2026-06-25: dETH faucet hex on testnet v0.15 (was
+             0x0a7d175e… on v0.14). The Epoch bridge will mint dUSDC
+             from its own faucet on Miden side; until Epoch publishes
+             that hex, point at our local dETH faucet so worker has a
+             concrete asset to scan/credit. -->
         <key>DARWIN_RELAY_V2_FAUCET_HEX</key>
-        <string>0x0a7d175ed63ec5200fb2ced86f6aa5</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_FAUCET_HEX</key>
-        <string>0x0a7d175ed63ec5200fb2ced86f6aa5</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
+        <!-- 2026-06-25: native controller for Miden-native flow polling.
+             Same as the v7 controller now on v0.15 testnet. Set to
+             empty string to disable native polling. -->
+        <key>DARWIN_RELAY_V2_NATIVE_CONTROLLER_HEX</key>
+        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
+        <!-- Bali path is dormant (outbound_mode=bridge_out_v1 + bridge
+             returns 404 since the v0.15 migration). Worker still parses
+             these at boot, so we point at any valid v0.15 testnet hex
+             to keep the boot pass. The DETH faucet is reused as a
+             placeholder — never actually called for Bali. -->
         <key>DARWIN_RELAY_V2_BALI_FAUCET_HEX</key>
-        <string>0xe63ba7bc2c19ff603c52c67fa4426d</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_HEX</key>
-        <string>0xc98bb07c188cd2500e13f68a069cdc</string>
+        <string>0xb0411b0e0c4985115c03d034234110</string>
         <key>DARWIN_RELAY_V2_BALI_BRIDGE_SERVICE</key>
         <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
         <key>DARWIN_RELAY_V2_WORKER_INTERVAL_S</key>
