@@ -48,6 +48,16 @@
         <string>/Users/eden</string>
         <key>NODE_ENV</key>
         <string>production</string>
+        <!-- 2026-07-04: the fresh v7 controller (0x6687e59f…) was
+             deployed under Miden v0.15 and the default v0.14 CLI can't
+             parse v0.15 account IDs, so /api/position spawned the
+             wrong binary. Explicitly point at the v0.15 toolchain and
+             at the relay's permanent HOME so the same account/keystore
+             state is available (needed for import_account_by_id). -->
+        <key>DARWIN_MIDEN_CLIENT_BIN</key>
+        <string>/Users/eden/Library/Application Support/midenup/toolchains/0.15.0/bin/miden-client</string>
+        <key>DARWIN_MIDEN_HOME</key>
+        <string>/Users/eden/data/darwin/.relay-miden-testnet</string>
     </dict>
 
     <key>RunAtLoad</key>
