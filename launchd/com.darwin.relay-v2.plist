@@ -28,19 +28,20 @@
         <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
         <key>RUST_LOG</key>
         <string>info</string>
-        <!-- 2026-06-25: testnet migrated to Miden v0.15. New chain,
-             fresh store + keystore. See worker plist for context. -->
+        <!-- 2026-07-04: HOME moved out of /tmp (macOS wipe killed the
+             worker overnight). See worker plist header for context. -->
         <key>MIDEN_NETWORK</key>
         <string>testnet</string>
         <key>DARWIN_RELAY_V2_STORE</key>
         <string>/tmp/darwin-relay/relay-v2.sqlite</string>
         <key>DARWIN_RELAY_V2_MIDEN_STORE</key>
-        <string>/tmp/miden-relay-testnet-home/.miden/store.sqlite3</string>
+        <string>/Users/eden/data/darwin/.relay-miden-testnet/.miden/store.sqlite3</string>
         <key>DARWIN_RELAY_V2_MIDEN_KEYSTORE</key>
-        <string>/tmp/miden-relay-testnet-home/.miden/keystore</string>
+        <string>/Users/eden/data/darwin/.relay-miden-testnet/.miden/keystore</string>
         <key>DARWIN_RELAY_V2_RELAY_WALLET_HEX</key>
-        <!-- 2026-06-25: fresh Public relay wallet on testnet v0.15. -->
-        <string>0x98494868d18218b12f09e9bef727a1</string>
+        <!-- 2026-07-04: fresh Public relay wallet on testnet v0.15,
+             created in the permanent HOME. Same wallet as the worker. -->
+        <string>0x66e7105ea36a7491325480accb7331</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
         <!-- 2026-06-23: v7 controller redeployed on testnet v0.15. -->
         <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
