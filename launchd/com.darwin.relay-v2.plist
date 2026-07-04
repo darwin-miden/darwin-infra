@@ -44,7 +44,7 @@
         <string>0x66e7105ea36a7491325480accb7331</string>
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
         <!-- 2026-06-23: v7 controller redeployed on testnet v0.15. -->
-        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
+        <string>0x6687e59f895c7e3115c654ca7ccbbb</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
         <string>bridge_out_v1</string>
         <!-- Bali dormant; placeholder valid v0.15 hex so boot passes. -->

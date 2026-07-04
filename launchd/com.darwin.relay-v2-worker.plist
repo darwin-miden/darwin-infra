@@ -52,7 +52,7 @@
         <key>DARWIN_RELAY_V2_CONTROLLER_HEX</key>
         <!-- 2026-06-23: v7 controller redeployed on testnet v0.15
              (was 0xbef7d2e89e9c3e006e10f959fa16d2 on v0.14). -->
-        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
+        <string>0x6687e59f895c7e3115c654ca7ccbbb</string>
         <key>DARWIN_RELAY_V2_OUTBOUND_MODE</key>
         <string>bridge_out_v1</string>
         <!-- 2026-07-04: Epoch published the fresh dUSDC faucet on
@@ -66,7 +66,7 @@
              Same as the v7 controller now on v0.15 testnet. Set to
              empty string to disable native polling. -->
         <key>DARWIN_RELAY_V2_NATIVE_CONTROLLER_HEX</key>
-        <string>0x719bd3a14b42533115b1bcc8e02ea5</string>
+        <string>0x6687e59f895c7e3115c654ca7ccbbb</string>
         <!-- Bali path is dormant (outbound_mode=bridge_out_v1 + bridge
              returns 404 since the v0.15 migration). Worker still parses
              these at boot, so we point at any valid v0.15 testnet hex
