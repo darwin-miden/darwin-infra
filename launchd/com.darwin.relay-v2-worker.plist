@@ -80,6 +80,19 @@
         <string>https://miden-testnet-bridge.dev.eu-north-3.gateway.fm</string>
         <key>DARWIN_RELAY_V2_WORKER_INTERVAL_S</key>
         <string>30</string>
+        <!-- 2026-07-04: Solution B (network-account) on-ramp. When set
+             to a v8 controller hex, the worker adds a
+             `NetworkAccountTarget` attachment to every
+             atomic_deposit_note it emits. The note continues to be
+             consumed by v7 today (worker's own drain path), but the
+             moment Miden's ntx-builder starts processing arbitrary
+             Public network accounts on testnet, the network
+             auto-consumes into v8 without any other Darwin change. See
+             darwin-protocol/crates/darwin-protocol-account/src/bin/
+             deploy_v8_network.rs. Empty string = attachment omitted
+             (default; matches pre-flag behavior). -->
+        <key>DARWIN_RELAY_V2_NETWORK_ACCOUNT_HEX</key>
+        <string>0x5a79c602ac2681313adc608901dc51</string>
         <!-- 2026-06-10: Epoch dUSDC path. The Epoch bridge ships
              USD-pegged tokens to the Miden side, so the worker
              needs to value incoming amounts at $1 instead of the
